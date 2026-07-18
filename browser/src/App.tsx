@@ -58,16 +58,26 @@ const App = () => {
   const videoStyle = useMemo(() => {
     const baseStyle = {
       transformOrigin: 'center',
-      // maxWidth: shouldSwapDimensions ? '100vh' : '100%',
-      // maxHeight: shouldSwapDimensions ? '100vw' : '100%'
+      maxWidth: shouldSwapDimensions ? '100vh' : '100%',
+      maxHeight: shouldSwapDimensions ? '100vw' : '100%'
     };
+
+    if (videoScale === -1) {
+      return {
+        ...baseStyle,
+        width: '100%',
+        maxHeight: undefined,
+        maxWidth: undefined
+      };
+    }
 
     if (videoScale === 0) {
       return {
         ...baseStyle,
-        width: '200%'
-        // objectFit: 'contain',
-        // transform: `rotate(${videoRotation}deg)`
+        width: shouldSwapDimensions ? '100vh' : '100%',
+        height: shouldSwapDimensions ? '100vw' : '100%',
+        objectFit: 'contain',
+        transform: `rotate(${videoRotation}deg)`
       };
     }
 

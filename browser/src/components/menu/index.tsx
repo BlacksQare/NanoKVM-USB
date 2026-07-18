@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Divider } from 'antd';
 import clsx from 'clsx';
-import { useAtomValue } from 'jotai';
-import { ChevronRightIcon, GripVerticalIcon, XIcon } from 'lucide-react';
+import { useAtomValue, useAtom } from 'jotai';
+import { ChevronRightIcon, GripVerticalIcon, XIcon, MousePointerClickIcon } from 'lucide-react';
 import Draggable, { type DraggableProps } from 'react-draggable';
 
 import { serialStateAtom } from '@/jotai/device.ts';
+import { mouseJigglerModeAtom } from '@/jotai/mouse.ts';
 import * as storage from '@/libs/storage';
 
 import { Audio } from './audio';
@@ -66,6 +67,8 @@ export const Menu = () => {
     storage.setIsMenuOpen(isOpen);
   }
 
+  const [jigglerMode, setJigglerMode] = useAtom(mouseJigglerModeAtom);
+
   return (
     <SafeDraggable
       nodeRef={nodeRef}
@@ -109,7 +112,13 @@ export const Menu = () => {
             <Recorder />
 
             <Divider type="vertical" className="px-0.5" />
-
+            <div className="flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded text-neutral-300 hover:bg-neutral-700/50 hover:text-white"
+              onClick={() => setJigglerMode(jigglerMode === 'enable' ? 'disable' : 'enable')}
+            >
+              <MousePointerClickIcon size={16} 
+                className={clsx('cursor-pointer', jigglerMode === 'enable' ? 'text-blue-500' : 'text-neutral-300')} 
+              />
+            </div>
             <Settings />
             <Fullscreen />
             <div

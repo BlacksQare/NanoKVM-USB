@@ -1,7 +1,8 @@
 import { device } from '@/libs/device';
 import { MouseReportRelative } from '@/libs/mouse';
 
-const MOUSE_JIGGLER_INTERVAL = 15_000;
+const MOUSE_JIGGLER_INTERVAL = 100;
+const MOUSE_JIGGLER_TIMEOUT = 1000;
 
 class MouseJiggler {
   private lastMoveTime: number;
@@ -25,7 +26,7 @@ class MouseJiggler {
     } else if (mode === 'enable' && this.timer === null) {
       this.timer = setInterval(() => {
         this.timeoutCallback();
-      }, MOUSE_JIGGLER_INTERVAL / 5);
+      }, MOUSE_JIGGLER_INTERVAL);
     }
   }
 
@@ -37,18 +38,15 @@ class MouseJiggler {
   }
 
   timeoutCallback(): void {
-    if (Date.now() - this.lastMoveTime > MOUSE_JIGGLER_INTERVAL) {
-      this.lastMoveTime = Date.now() - 1_000;
+    if (Date.now() - this.lastMoveTime > MOUSE_JIGGLER_TIMEOUT) {
+      this.lastMoveTime = Date.now();
       this.sendJiggle();
     }
   }
 
   async sendJiggle(): Promise<void> {
-    const report1 = this.mouseReport.buildReport(10, 10, 0);
-    const report2 = this.mouseReport.buildReport(-10, -10, 0);
-
-    await device.sendKeyboardData([0x01, ...report1]);
-    await device.sendKeyboardData([0x01, ...report2]);
+    const report1 = this.mouseReport.buildReport(Math.random() * 2 - 1, Math.random() * 2 - 1, 0);
+    await device.sendMouseData([0x01, ...report1]);
   }
 }
 

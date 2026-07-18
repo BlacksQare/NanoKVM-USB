@@ -14,7 +14,8 @@ export const Scale = (): ReactElement => {
   const [videoScale, setVideoScale] = useAtom(videoScaleAtom);
 
   const ScaleList = [
-    { label: 'Ultrawide', value: 0 },
+    { label: 'Ultrawide', value: -1 },
+    { label: t('video.auto'), value: 0 },
     { label: '200', value: 2 },
     { label: '150', value: 1.5 },
     { label: '100', value: 1 },
