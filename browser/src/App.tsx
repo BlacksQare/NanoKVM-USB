@@ -58,17 +58,16 @@ const App = () => {
   const videoStyle = useMemo(() => {
     const baseStyle = {
       transformOrigin: 'center',
-      maxWidth: shouldSwapDimensions ? '100vh' : '100%',
-      maxHeight: shouldSwapDimensions ? '100vw' : '100%'
+      // maxWidth: shouldSwapDimensions ? '100vh' : '100%',
+      // maxHeight: shouldSwapDimensions ? '100vw' : '100%'
     };
 
     if (videoScale === 0) {
       return {
         ...baseStyle,
-        width: shouldSwapDimensions ? '100vh' : '100%',
-        height: shouldSwapDimensions ? '100vw' : '100%',
-        objectFit: 'contain',
-        transform: `rotate(${videoRotation}deg)`
+        width: '200%'
+        // objectFit: 'contain',
+        // transform: `rotate(${videoRotation}deg)`
       };
     }
 
@@ -151,7 +150,8 @@ const App = () => {
         id="video"
         className={clsx(
           'block select-none',
-          shouldSwapDimensions ? 'min-h-[640px] min-w-[360px]' : 'min-h-[360px] min-w-[640px]',
+          'w-[3440px], h-[1440px]',
+          // shouldSwapDimensions ? 'min-h-[640px] min-w-[360px]' : 'min-h-[360px] min-w-[640px]',
           mouseStyle
         )}
         style={videoStyle as CSSProperties}

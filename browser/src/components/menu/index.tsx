@@ -3,7 +3,7 @@ import { Divider } from 'antd';
 import clsx from 'clsx';
 import { useAtomValue } from 'jotai';
 import { ChevronRightIcon, GripVerticalIcon, XIcon } from 'lucide-react';
-import Draggable from 'react-draggable';
+import Draggable, { type DraggableProps } from 'react-draggable';
 
 import { serialStateAtom } from '@/jotai/device.ts';
 import * as storage from '@/libs/storage';
@@ -16,6 +16,11 @@ import { Recorder } from './recorder';
 import { SerialPort } from './serial-port';
 import { Settings } from './settings';
 import { Video } from './video';
+
+// Workaround for @types/react-draggable React 18+ defaultProps typing issue
+const SafeDraggable = Draggable as React.ComponentType<
+  Partial<DraggableProps> & { children?: React.ReactNode }
+>;
 
 export const Menu = () => {
   const serialState = useAtomValue(serialStateAtom);
@@ -62,7 +67,7 @@ export const Menu = () => {
   }
 
   return (
-    <Draggable
+    <SafeDraggable
       nodeRef={nodeRef}
       bounds={menuBounds}
       handle="strong"
@@ -134,6 +139,6 @@ export const Menu = () => {
           )}
         </div>
       </div>
-    </Draggable>
+    </SafeDraggable>
   );
 };
