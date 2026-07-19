@@ -1,6 +1,5 @@
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { Alert, Result, Spin } from 'antd';
-import clsx from 'clsx';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from 'react-responsive';
@@ -18,7 +17,6 @@ import {
   videoStateAtom
 } from '@/jotai/device.ts';
 import { isKeyboardEnableAtom } from '@/jotai/keyboard.ts';
-import { mouseStyleAtom } from '@/jotai/mouse.ts';
 import { device } from '@/libs/device';
 import { camera } from '@/libs/media/camera';
 import { checkPermission, requestCameraPermission } from '@/libs/media/permission.ts';
@@ -29,13 +27,12 @@ const App = () => {
   const { t } = useTranslation();
   const isBigScreen = useMediaQuery({ minWidth: 850 });
 
-  const mouseStyle = useAtomValue(mouseStyleAtom);
-  const videoScale = useAtomValue(videoScaleAtom);
   const videoState = useAtomValue(videoStateAtom);
   const serialState = useAtomValue(serialStateAtom);
   const isKeyboardEnable = useAtomValue(isKeyboardEnableAtom);
   const setResolution = useSetAtom(resolutionAtom);
   const [videoRotation, setVideoRotation] = useAtom(videoRotationAtom);
+  const [videoScale, setVideoScale] = useAtom(videoScaleAtom);
 
   const [isLoading, setIsLoading] = useState(true);
   const [isCameraGranted, setIsCameraGranted] = useState(false);
@@ -43,6 +40,7 @@ const App = () => {
 
   useEffect(() => {
     initResolution();
+    initScale();
     initRotation();
 
     return () => {
@@ -95,6 +93,15 @@ const App = () => {
     }
 
     requestPermission(resolution);
+  }
+
+  function initScale() {
+    const scale = storage.getVideoScale();
+    if (scale) {
+      setVideoScale(scale);
+      return;
+    }
+    setVideoScale(0);
   }
 
   function initRotation() {
@@ -155,16 +162,10 @@ const App = () => {
           )}
         </>
       )}
-
       <video
         id="video"
-        className={clsx(
-          'block select-none',
-          'w-[3440px], h-[1440px]',
-          // shouldSwapDimensions ? 'min-h-[640px] min-w-[360px]' : 'min-h-[360px] min-w-[640px]',
-          mouseStyle
-        )}
         style={videoStyle as CSSProperties}
+        // muted
         autoPlay
         playsInline
       />

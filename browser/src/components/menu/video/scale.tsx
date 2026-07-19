@@ -25,6 +25,7 @@ export const Scale = (): ReactElement => {
 
   useEffect(() => {
     const scale = storage.getVideoScale();
+    console.log("ASDFASDFASDFASDFASDFASDFASDFASSDFASDFASDFASDF",scale)
     if (scale) {
       setVideoScale(scale);
     }

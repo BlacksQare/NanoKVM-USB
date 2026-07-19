@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { message } from 'antd';
-import { useAtomValue } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
 import { MouseRelativeEvent } from '@/components/mouse/types.ts';
@@ -8,6 +8,7 @@ import { scrollDirectionAtom, scrollIntervalAtom } from '@/jotai/mouse.ts';
 import { device } from '@/libs/device';
 import { MouseReportRelative } from '@/libs/mouse';
 import { mouseJiggler } from '@/libs/mouse-jiggler';
+import { mouseLockModeAtom } from '@/jotai/mouse.ts';
 
 export const Relative = () => {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export const Relative = () => {
   const scrollInterval = useAtomValue(scrollIntervalAtom);
 
   const mouseRef = useRef(new MouseReportRelative());
-  const isLockedRef = useRef(false);
+  const [isLockedRef, setIsLockedRef] = useAtom(mouseLockModeAtom);
   const lastScrollTimeRef = useRef(0);
 
   showMessage();
@@ -38,7 +39,7 @@ export const Relative = () => {
     function handleClick(event: MouseEvent): void {
       disableEvent(event);
 
-      if (!isLockedRef.current) {
+      if (!isLockedRef) {
         screen?.requestPointerLock();
       }
     }
@@ -61,10 +62,14 @@ export const Relative = () => {
 
       const x = e.movementX || 0;
       const y = e.movementY || 0;
+      
       if (x === 0 && y === 0) return;
 
-      const deltaX = Math.abs(x * window.devicePixelRatio) < 10 ? x * 2 : x;
-      const deltaY = Math.abs(y * window.devicePixelRatio) < 10 ? y * 2 : y;
+      // USB HID reports require integers. 
+      // Math.trunc ensures we drop any sub-pixel floating point values 
+      // that Wayland/browsers sometimes generate under fractional scaling.
+      const deltaX = Math.trunc(x);
+      const deltaY = Math.trunc(y);
 
       handleMouseEvent({ type: 'move', deltaX, deltaY });
     }
@@ -89,7 +94,7 @@ export const Relative = () => {
 
     // Pointer lock state change
     function handlePointerLockChange(): void {
-      isLockedRef.current = document.pointerLockElement === screen;
+      setIsLockedRef(document.pointerLockElement === screen);
     }
 
     return (): void => {

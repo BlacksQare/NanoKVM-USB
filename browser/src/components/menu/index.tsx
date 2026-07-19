@@ -2,11 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Divider } from 'antd';
 import clsx from 'clsx';
 import { useAtomValue, useAtom } from 'jotai';
-import { ChevronRightIcon, GripVerticalIcon, XIcon, MousePointerClickIcon } from 'lucide-react';
-import Draggable, { type DraggableProps } from 'react-draggable';
+import { MousePointerClickIcon } from 'lucide-react';
 
 import { serialStateAtom } from '@/jotai/device.ts';
-import { mouseJigglerModeAtom } from '@/jotai/mouse.ts';
+import { mouseJigglerModeAtom, mouseLockModeAtom } from '@/jotai/mouse.ts';
 import * as storage from '@/libs/storage';
 
 import { Audio } from './audio';
@@ -18,31 +17,15 @@ import { SerialPort } from './serial-port';
 import { Settings } from './settings';
 import { Video } from './video';
 
-// Workaround for @types/react-draggable React 18+ defaultProps typing issue
-const SafeDraggable = Draggable as React.ComponentType<
-  Partial<DraggableProps> & { children?: React.ReactNode }
->;
-
 export const Menu = () => {
   const serialState = useAtomValue(serialStateAtom);
 
   const [isMenuOpen, setIsMenuOpen] = useState(true);
-  const [menuBounds, setMenuBounds] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
 
   const nodeRef = useRef<HTMLDivElement | null>(null);
 
   const handleResize = useCallback(() => {
     if (!nodeRef.current) return;
-
-    const elementRect = nodeRef.current.getBoundingClientRect();
-    const width = (window.innerWidth - elementRect.width) / 2;
-
-    setMenuBounds({
-      left: -width,
-      top: -10,
-      right: width,
-      bottom: window.innerHeight - elementRect.height - 10
-    });
   }, []);
 
   useEffect(() => {
@@ -60,23 +43,12 @@ export const Menu = () => {
     handleResize();
   }, [isMenuOpen, serialState, handleResize]);
 
-  function toggleMenu() {
-    const isOpen = !isMenuOpen;
-
-    setIsMenuOpen(isOpen);
-    storage.setIsMenuOpen(isOpen);
-  }
-
   const [jigglerMode, setJigglerMode] = useAtom(mouseJigglerModeAtom);
+  const [isMouseLock] = useAtom(mouseLockModeAtom);
 
-  return (
-    <SafeDraggable
-      nodeRef={nodeRef}
-      bounds={menuBounds}
-      handle="strong"
-      positionOffset={{ x: '-50%', y: '0%' }}
-    >
-      <div
+  return ( 
+    <>
+      {!isMouseLock && (<div
         ref={nodeRef}
         className="fixed left-1/2 top-[10px] z-[1000] -translate-x-1/2 transition-opacity duration-300"
       >
@@ -88,12 +60,6 @@ export const Menu = () => {
               isMenuOpen ? 'flex' : 'hidden'
             )}
           >
-            <strong>
-              <div className="flex h-[28px] cursor-move select-none items-center justify-center text-neutral-400">
-                <GripVerticalIcon size={18} />
-              </div>
-            </strong>
-            <Divider type="vertical" />
 
             <Video />
             <Audio />
@@ -121,33 +87,9 @@ export const Menu = () => {
             </div>
             <Settings />
             <Fullscreen />
-            <div
-              className="flex h-[28px] w-[28px] cursor-pointer items-center justify-center rounded text-white hover:bg-neutral-700/70"
-              onClick={toggleMenu}
-            >
-              <XIcon size={18} />
-            </div>
           </div>
-
-          {/* Menubar expand button */}
-          {!isMenuOpen && (
-            <div className="flex items-center rounded-lg bg-neutral-800/50 p-1">
-              <strong>
-                <div className="flex size-[26px] cursor-move select-none items-center justify-center text-neutral-400">
-                  <GripVerticalIcon size={18} />
-                </div>
-              </strong>
-              <Divider type="vertical" style={{ margin: '0 4px' }} />
-              <div
-                className="flex size-[26px] cursor-pointer items-center justify-center rounded text-neutral-400 hover:bg-neutral-700/70 hover:text-white"
-                onClick={toggleMenu}
-              >
-                <ChevronRightIcon size={18} />
-              </div>
-            </div>
-          )}
         </div>
-      </div>
-    </SafeDraggable>
+      </div>)}
+      </>
   );
 };
