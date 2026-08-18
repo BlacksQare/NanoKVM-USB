@@ -60,6 +60,15 @@ const App = () => {
       maxHeight: shouldSwapDimensions ? '100vw' : '100%'
     };
 
+    if (videoScale === -2) {
+      return {
+        ...baseStyle,
+        width: '100%',
+        maxHeight: undefined,
+        maxWidth: undefined
+      };
+    }
+
     if (videoScale === -1) {
       return {
         ...baseStyle,

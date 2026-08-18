@@ -1,8 +1,8 @@
 import { device } from '@/libs/device';
 import { MouseReportRelative } from '@/libs/mouse';
 
-const MOUSE_JIGGLER_INTERVAL = 100;
-const MOUSE_JIGGLER_TIMEOUT = 1000;
+const MOUSE_JIGGLER_INTERVAL = 500;
+const MOUSE_JIGGLER_TIMEOUT = 15000;
 
 class MouseJiggler {
   private lastMoveTime: number;
@@ -46,6 +46,18 @@ class MouseJiggler {
 
   async sendJiggle(): Promise<void> {
     const report1 = this.mouseReport.buildReport(Math.random() * 2 - 1, Math.random() * 2 - 1, 0);
+    if(Math.random() < 0.4) {
+      const report2 = this.mouseReport
+      report2.buttonDown(0);
+      const r2=report2.buildButtonReport();
+      
+      const report3 = this.mouseReport
+      report3.buttonUp(0);
+      const r3=report3.buildButtonReport();
+
+      await device.sendMouseData([0x01, ...r2]);
+      await device.sendMouseData([0x01, ...r3]);
+    }
     await device.sendMouseData([0x01, ...report1]);
   }
 }

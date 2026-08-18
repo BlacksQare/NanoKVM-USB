@@ -14,6 +14,7 @@ export const Scale = (): ReactElement => {
   const [videoScale, setVideoScale] = useAtom(videoScaleAtom);
 
   const ScaleList = [
+    { label: 'Crop to width', value: -2 },
     { label: 'Stretch', value: -1 },
     { label: 'Fit', value: 0 },
     { label: '200', value: 2 },
