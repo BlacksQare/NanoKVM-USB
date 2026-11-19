@@ -6,6 +6,7 @@ import { getOperatingSystem } from '@/libs/browser';
 import { device } from '@/libs/device';
 import { KeyboardReport } from '@/libs/keyboard/keyboard.ts';
 import { isModifier } from '@/libs/keyboard/keymap.ts';
+import { mouseJiggler } from '@/libs/mouse-jiggler';
 
 interface AltGrState {
   active: boolean;
@@ -195,6 +196,7 @@ export const Keyboard = () => {
   async function handleKeyEvent(event: { type: 'keydown' | 'keyup'; code: string }): Promise<void> {
     const kb = keyboardRef.current;
     const report = event.type === 'keydown' ? kb.keyDown(event.code) : kb.keyUp(event.code);
+    mouseJiggler.moveEventCallback();
     await device.sendKeyboardData(report);
   }
 
